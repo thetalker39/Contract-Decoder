@@ -2,13 +2,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import NextLink, { LinkProps as NextLinkProps } from "next/link"; // Renamed to avoid conflict
-import React, { useState, createContext, useContext } from "react";
+import NextLink, { LinkProps as NextLinkProps } from "next/link";
+import React, { useState, createContext, useContext, useRef, useEffect } from "react"; // Added useRef, useEffect
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
-// Interface for link items, compatible with existing navItems
-export interface SidebarLinkItem { // Exporting for use in sidebar-nav.tsx
+export interface SidebarLinkItem {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
@@ -32,7 +31,7 @@ export const useSidebar = () => {
   return context;
 };
 
-// This Provider is internal to this component. If RootLayout needs one, it should use this one.
+// Renamed from SidebarProvider to avoid conflict if user has their own
 const InternalSidebarProvider = ({ 
   children,
   open: openProp,
@@ -44,13 +43,12 @@ const InternalSidebarProvider = ({
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
 }) => {
-  const [openState, setOpenState] = useState(false); // Default to closed for mobile-first logic
+  const [openState, setOpenState] = useState(false);
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 
-  // Add keyboard shortcut to toggle sidebar (Ctrl/Cmd + B)
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "b" && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
@@ -64,7 +62,6 @@ const InternalSidebarProvider = ({
     };
   }, [setOpen]);
 
-
   return (
     <SidebarContext.Provider value={{ open, setOpen, animate }}>
       {children}
@@ -72,7 +69,6 @@ const InternalSidebarProvider = ({
   );
 };
 
-// Main Sidebar component - acts as the provider wrapper
 export const Sidebar = ({
   children,
   open,
@@ -91,10 +87,7 @@ export const Sidebar = ({
   );
 };
 
-
 export const SidebarBody = (props: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode}) => {
-  // This component now just decides whether to render Desktop or Mobile structure
-  // The actual sidebar content (links, logo etc) will be passed as children
   return (
     <>
       <DesktopSidebar {...props} />
@@ -106,28 +99,53 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div> & { l
 export const DesktopSidebar = ({
   className,
   children,
-  logoSlotMobile, // Destructure logoSlotMobile to prevent it from being spread by ...rest
-  ...rest // Use ...rest for remaining motion.div props
-}: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => { // Add logoSlotMobile to component's props type
+  logoSlotMobile, 
+  ...rest 
+}: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => {
   const { open, setOpen, animate } = useSidebar();
+  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+    if (animate && !open) {
+      setOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (animate && open) {
+      leaveTimeoutRef.current = setTimeout(() => {
+        setOpen(false);
+      }, 150); // Delay before closing
+    }
+  };
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border", 
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border overflow-hidden", // Added overflow-hidden
         className
       )}
       animate={{
         width: animate ? (open ? "260px" : "72px") : "260px", 
       }}
-      onMouseEnter={() => {
-        if (animate && !open) setOpen(true);
-      }}
-      onMouseLeave={() => {
-        if (animate && open) setOpen(false);
-      }}
-      {...rest} // Spread only the valid DOM/motion props
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      {...rest} 
     >
-      {children} {/* Children will be SidebarNav content */}
+      {children} 
     </motion.div>
   );
 };
@@ -135,19 +153,19 @@ export const DesktopSidebar = ({
 export const MobileSidebar = ({
   className,
   children,
-  logoSlotMobile, // Destructure logoSlotMobile here
+  logoSlotMobile,
   ...props
 }: React.ComponentProps<"div"> & { logoSlotMobile?: React.ReactNode}) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
-      {/* This div is part of the AppHeader essentially for mobile */}
       <div
         className={cn(
           "h-16 px-4 flex flex-row md:hidden items-center justify-between bg-background text-foreground w-full border-b border-border sticky top-0 z-20",
+           // Using theme colors for mobile header bar
         )}
       >
-        {logoSlotMobile} {/* Slot for logo on mobile header */}
+        {logoSlotMobile} 
         <Menu
             className="text-foreground cursor-pointer h-6 w-6" 
             onClick={() => setOpen(!open)}
@@ -164,7 +182,7 @@ export const MobileSidebar = ({
               ease: "easeInOut",
             }}
             className={cn(
-              "fixed h-full w-full inset-0 bg-sidebar text-sidebar-foreground p-6 z-[100] flex flex-col justify-between", 
+              "fixed h-full w-full inset-0 bg-sidebar text-sidebar-foreground p-6 z-[100] flex flex-col justify-between md:hidden", // Ensure it's hidden on md+
               className
             )}
           >
@@ -174,7 +192,6 @@ export const MobileSidebar = ({
             >
               <X className="h-6 w-6"/>
             </div>
-            {/* Children (SidebarNav content) will be rendered here for mobile */}
             <div className="flex flex-col h-full">
                 {children}
             </div>
@@ -194,7 +211,7 @@ export const SidebarLink = ({
   link: SidebarLinkItem; 
   className?: string;
   isActive?: boolean; 
-  props?: NextLinkProps;
+  props?: NextLinkProps; // Should be Omit<NextLinkProps, 'href'> but NextLinkProps is fine for spreading
 }) => {
   const { open, animate } = useSidebar();
   return (
@@ -211,13 +228,14 @@ export const SidebarLink = ({
       {React.cloneElement(link.icon as React.ReactElement, { className: cn("h-5 w-5 flex-shrink-0", isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground group-hover/sidebar:text-sidebar-accent-foreground") })}
       <motion.span
         animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
+          display: animate && open ? "inline-block" : "none", // Simpler logic for display
+          opacity: animate && open ? 1 : 0,                 // Simpler logic for opacity
         }}
+        transition={{ duration: 0.15 }} // Faster transition for text
         className={cn(
-            "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0",
+            "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre", // Removed inline-block, !p-0, !m-0 as motion.span handles display
             isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground", 
-             (animate && !open) ? "md:hidden" : ""
+            (animate && !open) ? "md:hidden" : "" // Keep md:hidden when collapsed and animated for desktop
         )}
       >
         {link.label}
@@ -225,4 +243,3 @@ export const SidebarLink = ({
     </NextLink>
   );
 };
-
