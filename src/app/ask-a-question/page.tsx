@@ -54,7 +54,7 @@ export default function AskAQuestionPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-primary">Ask A Question</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-black">Ask A Question</h1>
         <p className="text-muted-foreground">
           Get suggestions and answers to your contract-related questions.
         </p>
@@ -62,7 +62,7 @@ export default function AskAQuestionPage() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-primary">Enter Question Text</CardTitle>
+          <CardTitle className="text-card-foreground">Enter Question Text</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -76,8 +76,7 @@ export default function AskAQuestionPage() {
             />
             <Button type="submit" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Ask"}
-            </Button>
-          </form>
+            </Button>          </form>
         </CardContent>
       </Card>
 
