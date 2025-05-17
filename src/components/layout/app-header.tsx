@@ -2,7 +2,7 @@
 "use client";
 // This component might be largely unused or simplified if the new sidebar handles mobile header toggle.
 // For now, keeping it minimal. If MobileSidebar needs a logo, it can be passed as a prop.
-import Logo from "@/components/icons/logo";
+// Removed unused Logo import
 
 export default function AppHeader() {
   // The new MobileSidebar contains its own toggle and structure.
@@ -16,9 +16,6 @@ export default function AppHeader() {
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-border bg-background px-6 shadow-sm md:hidden">
       {/* On mobile, the new MobileSidebar component handles the header appearance and menu toggle */}
       {/* Logo for mobile is now passed as a prop to SidebarBody -> MobileSidebar */}
-      {/* <Logo className="text-lg" /> */}
-      {/* UserMenu or other header items can be added here */}
     </header>
   );
 }
-```

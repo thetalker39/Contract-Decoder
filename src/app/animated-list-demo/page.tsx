@@ -1,43 +1,17 @@
+
 "use client";
 
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { SidebarLink } from "@/components/ui/sidebar"; // Import new SidebarLink
-import type { SidebarLinkItem } from "@/components/ui/sidebar"; // Import type for links
-import Logo from "@/components/icons/logo";
-import { ScanLine, Info, Blend, LayoutList, HelpCircle } from "lucide-react"; // Added HelpCircle
-import { useSidebar } from "@/components/ui/sidebar"; 
-import React from "react"; 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-const navItems: SidebarLinkItem[] = [ 
-  { href: "/smart-scan", label: "Smart Scan", icon: <ScanLine /> },
-  { href: "/jargon-explanation", label: "Clarity Tool", icon: <Info /> },
-  { href: "/contract-analysis", label: "Compare & Refine", icon: <Blend /> },
-  { href: "/ask-a-question", label: "Ask A Question", icon: <HelpCircle /> }, // Updated
-];
+// This page is deprecated and was replaced by /ask-a-question.
+// Redirecting to dashboard to prevent any build issues from old content.
+export default function DeprecatedAnimatedListDemoPage() {
+  const router = useRouter();
 
-export default function SidebarNav() {
-  const pathname = usePathname();
-  const { open, animate } = useSidebar(); 
+  useEffect(() => {
+    router.replace('/dashboard');
+  }, [router]);
 
-  return (
-    <div className="flex flex-col h-full">
-      <div className={cn("p-4 mb-4", animate && !open ? "px-3.5" : "px-4")}> 
-        {animate && !open ? (
-           <Logo className="text-sm justify-center items-center flex [&>svg]:h-6 [&>svg]:w-6 [&>span]:hidden" />
-        ) : (
-          <Logo />
-        )}
-      </div>
-      <nav className="flex-1 flex flex-col gap-1 px-2"> 
-        {navItems.map((item) => (
-          <SidebarLink
-            key={item.href}
-            link={item}
-            isActive={pathname === item.href || (pathname === '/' && item.href === '/smart-scan')}
-          />
-        ))}
-      </nav>
-    </div>
-  );
+  return null; // Or a loading spinner, but null is fine for a quick redirect
 }
