@@ -3,7 +3,7 @@
 
 import { cn } from "@/lib/utils";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
-import React, { useState, createContext, useContext, useRef, useEffect } from "react"; // Added useRef, useEffect
+import React, { useState, createContext, useContext, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
@@ -31,7 +31,6 @@ export const useSidebar = () => {
   return context;
 };
 
-// Renamed from SidebarProvider to avoid conflict if user has their own
 const InternalSidebarProvider = ({ 
   children,
   open: openProp,
@@ -87,21 +86,33 @@ export const Sidebar = ({
   );
 };
 
-export const SidebarBody = (props: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode}) => {
+export const SidebarBody = (
+  props: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }
+) => {
+  // Explicitly destructure props
+  const { logoSlotMobile, children, className, ...desktopSpecificProps } = props;
+
   return (
     <>
-      <DesktopSidebar {...props} />
-      <MobileSidebar {...(props as React.ComponentProps<"div">)} />
+      {/* Pass only relevant props to DesktopSidebar. Children are needed. className can be passed if intended for the main div. */}
+      {/* desktopSpecificProps should now only contain motion.div compatible props. */}
+      <DesktopSidebar className={className} {...desktopSpecificProps}>
+        {children}
+      </DesktopSidebar>
+      {/* Pass explicitly needed props to MobileSidebar */}
+      <MobileSidebar className={className} logoSlotMobile={logoSlotMobile}>
+        {children}
+      </MobileSidebar>
     </>
   );
 };
 
+// DesktopSidebar no longer expects logoSlotMobile in its direct props type
 export const DesktopSidebar = ({
   className,
   children,
-  logoSlotMobile, 
-  ...rest 
-}: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => {
+  ...rest // These are motion.div compatible props from desktopSpecificProps
+}: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -119,11 +130,10 @@ export const DesktopSidebar = ({
     if (animate && open) {
       leaveTimeoutRef.current = setTimeout(() => {
         setOpen(false);
-      }, 150); // Delay before closing
+      }, 150); 
     }
   };
 
-  // Clear timeout on unmount
   useEffect(() => {
     return () => {
       if (leaveTimeoutRef.current) {
@@ -135,39 +145,43 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border overflow-hidden", // Added overflow-hidden
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border overflow-hidden",
         className
       )}
       animate={{
-        width: animate ? (open ? "260px" : "72px") : "260px", 
+        width: animate ? (open ? "260px" : "72px") : "260px",
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      {...rest} 
+      {...rest} // logoSlotMobile is not in rest
     >
-      {children} 
+      {children}
     </motion.div>
   );
 };
 
+// MobileSidebar receives props explicitly from SidebarBody
 export const MobileSidebar = ({
   className,
   children,
   logoSlotMobile,
-  ...props
-}: React.ComponentProps<"div"> & { logoSlotMobile?: React.ReactNode}) => {
+}: {
+  className?: string; // For the mobile header bar
+  children?: React.ReactNode;
+  logoSlotMobile?: React.ReactNode;
+}) => {
   const { open, setOpen } = useSidebar();
   return (
     <>
       <div
         className={cn(
           "h-16 px-4 flex flex-row md:hidden items-center justify-between bg-background text-foreground w-full border-b border-border sticky top-0 z-20",
-           // Using theme colors for mobile header bar
+          className, // Apply className to the mobile header bar
         )}
       >
-        {logoSlotMobile} 
+        {logoSlotMobile}
         <Menu
-            className="text-foreground cursor-pointer h-6 w-6" 
+            className="text-foreground cursor-pointer h-6 w-6"
             onClick={() => setOpen(!open)}
         />
       </div>
@@ -182,12 +196,12 @@ export const MobileSidebar = ({
               ease: "easeInOut",
             }}
             className={cn(
-              "fixed h-full w-full inset-0 bg-sidebar text-sidebar-foreground p-6 z-[100] flex flex-col justify-between md:hidden", // Ensure it's hidden on md+
-              className
+              "fixed h-full w-full inset-0 bg-sidebar text-sidebar-foreground p-6 z-[100] flex flex-col justify-between md:hidden"
+              // Note: className from SidebarBody is applied to the header bar, not this motion.div directly.
             )}
           >
             <div
-              className="absolute right-6 top-6 z-50 text-sidebar-foreground cursor-pointer" 
+              className="absolute right-6 top-6 z-50 text-sidebar-foreground cursor-pointer"
               onClick={() => setOpen(!open)}
             >
               <X className="h-6 w-6"/>
@@ -211,7 +225,7 @@ export const SidebarLink = ({
   link: SidebarLinkItem; 
   className?: string;
   isActive?: boolean; 
-  props?: NextLinkProps; // Should be Omit<NextLinkProps, 'href'> but NextLinkProps is fine for spreading
+  props?: NextLinkProps; 
 }) => {
   const { open, animate } = useSidebar();
   return (
@@ -228,14 +242,14 @@ export const SidebarLink = ({
       {React.cloneElement(link.icon as React.ReactElement, { className: cn("h-5 w-5 flex-shrink-0", isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground group-hover/sidebar:text-sidebar-accent-foreground") })}
       <motion.span
         animate={{
-          display: animate && open ? "inline-block" : "none", // Simpler logic for display
-          opacity: animate && open ? 1 : 0,                 // Simpler logic for opacity
+          display: animate && open ? "inline-block" : "none",
+          opacity: animate && open ? 1 : 0,                
         }}
-        transition={{ duration: 0.15 }} // Faster transition for text
+        transition={{ duration: 0.15 }} 
         className={cn(
-            "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre", // Removed inline-block, !p-0, !m-0 as motion.span handles display
+            "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre", 
             isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground", 
-            (animate && !open) ? "md:hidden" : "" // Keep md:hidden when collapsed and animated for desktop
+            (animate && !open) ? "md:hidden" : "" 
         )}
       >
         {link.label}
