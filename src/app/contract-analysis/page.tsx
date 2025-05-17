@@ -196,11 +196,11 @@ export default function ContractAnalysisPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2 pt-2">
           <Button onClick={handleCompare} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
             {isCompareLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Analyze Contract
+            Analyze
           </Button>
           <Button onClick={handleRefine} variant="outline" className="w-full sm:w-auto border-accent text-accent hover:bg-accent hover:text-accent-foreground" disabled={isLoading}>
             {isRefineLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Refine Contract
+            Refine
           </Button>
       </div>
 
