@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 config();
 
@@ -8,3 +9,4 @@ import '@/ai/flows/summarize-contract.ts';
 import '@/ai/flows/refine-contract.ts';
 import '@/ai/flows/scan-contract.ts';
 import '@/ai/flows/compare-contract.ts';
+import '@/ai/flows/answer-question-flow.ts'; // Added new flow
