@@ -31,6 +31,7 @@ export const useSidebar = () => {
   return context;
 };
 
+// Renamed from SidebarProvider to InternalSidebarProvider to avoid conflict
 const InternalSidebarProvider = ({
   children,
   open: openProp,
@@ -90,19 +91,23 @@ export const SidebarBody = ({
   logoSlotMobile,
   children,
   className,
-  ...rest
+  ...rest // All other props
 }: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => {
+  
+  // Prepare props for MobileSidebar
   const mobileSidebarProps = {
-    className,
+    className, // This className likely applies to the wrapper/header for mobile
     logoSlotMobile,
-    children,
+    children, // Children are passed to be rendered inside the mobile sheet
   };
 
+  // DesktopSidebar gets the remaining props (like Framer Motion props) and children
   const desktopSidebarProps = {
-    className,
+    className, // This className applies to the DesktopSidebar's motion.div
     children,
-    ...rest,
+    ...rest, // Spread the Framer motion props here
   };
+
 
   return (
     <>
@@ -116,7 +121,7 @@ export const SidebarBody = ({
 export const DesktopSidebar = ({
   className,
   children,
-  logoSlotMobile: _logoSlotMobile, // Explicitly receive and ignore if not used
+  // logoSlotMobile, // Explicitly destructure to prevent passing to motion.div
   ...rest
 }: Omit<React.ComponentProps<typeof motion.div>, 'logoSlotMobile'> & { logoSlotMobile?: React.ReactNode }) => {
   const { open, setOpen, animate } = useSidebar();
@@ -136,11 +141,12 @@ export const DesktopSidebar = ({
     if (animate && open) {
       leaveTimeoutRef.current = setTimeout(() => {
         setOpen(false);
-      }, 150);
+      }, 150); // Small delay before closing
     }
   };
 
    useEffect(() => {
+    // Cleanup timeout on component unmount
     return () => {
       if (leaveTimeoutRef.current) {
         clearTimeout(leaveTimeoutRef.current);
@@ -151,7 +157,7 @@ export const DesktopSidebar = ({
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border overflow-hidden",
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border overflow-hidden", // Added overflow-hidden
         className
       )}
       animate={{
@@ -159,7 +165,7 @@ export const DesktopSidebar = ({
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      {...rest}
+      {...rest} // Spread the rest of the props here (e.g., Framer Motion props)
     >
       {children}
     </motion.div>
@@ -181,7 +187,7 @@ export const MobileSidebar = ({
       <div
         className={cn(
           "h-16 px-4 flex flex-row md:hidden items-center justify-between bg-background text-foreground w-full border-b border-border sticky top-0 z-20",
-          className,
+          className, // This className is for the mobile header bar
         )}
       >
         {logoSlotMobile}
@@ -210,7 +216,7 @@ export const MobileSidebar = ({
             >
               <X className="h-6 w-6"/>
             </div>
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full"> {/* Ensure children take full height */}
                 {children}
             </div>
           </motion.div>
@@ -220,7 +226,6 @@ export const MobileSidebar = ({
   );
 };
 
-// Defining SidebarLinkProps type for clarity, matching `src/components/layout/sidebar-nav.tsx`
 interface SidebarLinkProps extends Omit<NextLinkProps, 'href'> {
   link: SidebarLinkItem;
   className?: string;
@@ -229,7 +234,7 @@ interface SidebarLinkProps extends Omit<NextLinkProps, 'href'> {
 
 export const SidebarLink = ({ link, className, isActive, ...props }: SidebarLinkProps) => {
   const { open, animate, setOpen } = useSidebar();
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false); // For client-side only rendering/styling
 
   useEffect(() => {
     setIsMounted(true);
@@ -242,45 +247,51 @@ export const SidebarLink = ({ link, className, isActive, ...props }: SidebarLink
     }
   };
 
+  // Define classes based on isActive, but apply them conditionally using isMounted
+  const linkBaseClasses = "flex items-center justify-start gap-3 group/sidebar py-2 px-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
+  const activeStateLinkClasses = isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground";
+  
+  const iconBaseClasses = "h-5 w-5 flex-shrink-0";
+  const activeStateIconClasses = isActive 
+    ? "text-sidebar-primary-foreground" 
+    : "text-sidebar-foreground group-hover/sidebar:text-sidebar-accent-foreground";
+
+  const labelBaseClasses = "text-sm group-hover/sidebar:translate-x-1 whitespace-pre overflow-hidden";
+  const activeStateLabelClasses = isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground";
+
   return (
     <NextLink
       href={link.href}
       onClick={handleClick}
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-2 px-2 rounded-md",
-        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground",
+        linkBaseClasses,
+        isMounted ? activeStateLinkClasses : "text-sidebar-foreground", // Fallback for SSR/initial client
         className
       )}
       {...props}
     >
       {isValidElement(link.icon) ? cloneElement(link.icon as React.ReactElement<{className?: string}>, {
         className: cn(
-          "h-5 w-5 flex-shrink-0",
+          iconBaseClasses,
           (link.icon as React.ReactElement<{className?: string}>).props.className,
-          isActive ? "text-sidebar-primary-foreground"
-                   : "text-sidebar-foreground group-hover/sidebar:text-sidebar-accent-foreground"
+          isMounted ? activeStateIconClasses : "text-sidebar-foreground group-hover/sidebar:text-sidebar-accent-foreground" // Fallback for SSR/initial client
         )
       }) : link.icon}
 
       {isMounted ? (
         <motion.span
-          key={link.label + (open ? "-open" : "-closed")}
-          initial={{ opacity: 0, width: 0 }}
+          key={link.label + (open ? "-open" : "-closed")} 
+          initial={false} 
           animate={{
-            opacity: animate && open ? 1 : 0, // Explicitly use animate context
-            width: animate && open ? 'auto' : 0,   // Explicitly use animate context
+            opacity: animate && open ? 1 : 0,
+            width: animate && open ? 'auto' : 0,
           }}
-          exit={{ opacity: 0, width: 0 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className={cn(
-            "text-sm group-hover/sidebar:translate-x-1 whitespace-pre overflow-hidden",
-            isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground"
-          )}
+          className={cn(labelBaseClasses, activeStateLabelClasses)} // isActive is fine here as span only renders when isMounted
         >
           {link.label}
         </motion.span>
-      ) : null }
+      ) : null}
     </NextLink>
   );
 };
