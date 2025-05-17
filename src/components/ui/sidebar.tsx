@@ -33,7 +33,7 @@ export const useSidebar = () => {
 };
 
 // This Provider is internal to this component. If RootLayout needs one, it should use this one.
-const InternalSidebarProvider = ({ // Renamed to avoid conflict with old SidebarProvider if any
+const InternalSidebarProvider = ({ 
   children,
   open: openProp,
   setOpen: setOpenProp,
@@ -106,18 +106,18 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div> & { l
 export const DesktopSidebar = ({
   className,
   children,
-  // logoSlotMobile, // Not used by DesktopSidebar directly
-  ...props
-}: React.ComponentProps<typeof motion.div>) => {
+  logoSlotMobile, // Destructure logoSlotMobile to prevent it from being spread by ...rest
+  ...rest // Use ...rest for remaining motion.div props
+}: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => { // Add logoSlotMobile to component's props type
   const { open, setOpen, animate } = useSidebar();
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border", // Adjusted width, added theme colors and border
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-sidebar text-sidebar-foreground w-[260px] flex-shrink-0 border-r border-sidebar-border", 
         className
       )}
       animate={{
-        width: animate ? (open ? "260px" : "72px") : "260px", // Adjusted collapsed width for icons
+        width: animate ? (open ? "260px" : "72px") : "260px", 
       }}
       onMouseEnter={() => {
         if (animate && !open) setOpen(true);
@@ -125,7 +125,7 @@ export const DesktopSidebar = ({
       onMouseLeave={() => {
         if (animate && open) setOpen(false);
       }}
-      {...props}
+      {...rest} // Spread only the valid DOM/motion props
     >
       {children} {/* Children will be SidebarNav content */}
     </motion.div>
@@ -145,13 +145,11 @@ export const MobileSidebar = ({
       <div
         className={cn(
           "h-16 px-4 flex flex-row md:hidden items-center justify-between bg-background text-foreground w-full border-b border-border sticky top-0 z-20",
-          // This container for the menu button is only visible on mobile
         )}
-        // {...props} // Props might not be needed here if it's just the trigger container
       >
         {logoSlotMobile} {/* Slot for logo on mobile header */}
         <Menu
-            className="text-foreground cursor-pointer h-6 w-6" // Use theme foreground
+            className="text-foreground cursor-pointer h-6 w-6" 
             onClick={() => setOpen(!open)}
         />
       </div>
@@ -166,12 +164,12 @@ export const MobileSidebar = ({
               ease: "easeInOut",
             }}
             className={cn(
-              "fixed h-full w-full inset-0 bg-sidebar text-sidebar-foreground p-6 z-[100] flex flex-col justify-between", // Theme colors, padding
+              "fixed h-full w-full inset-0 bg-sidebar text-sidebar-foreground p-6 z-[100] flex flex-col justify-between", 
               className
             )}
           >
             <div
-              className="absolute right-6 top-6 z-50 text-sidebar-foreground cursor-pointer" // Theme color
+              className="absolute right-6 top-6 z-50 text-sidebar-foreground cursor-pointer" 
               onClick={() => setOpen(!open)}
             >
               <X className="h-6 w-6"/>
@@ -190,22 +188,22 @@ export const MobileSidebar = ({
 export const SidebarLink = ({
   link,
   className,
-  isActive, // Added isActive prop
+  isActive, 
   ...props
 }: {
-  link: SidebarLinkItem; // Using the exported interface
+  link: SidebarLinkItem; 
   className?: string;
-  isActive?: boolean; // Added isActive prop
+  isActive?: boolean; 
   props?: NextLinkProps;
 }) => {
   const { open, animate } = useSidebar();
   return (
-    <NextLink // Using NextLink
+    <NextLink 
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-2 px-2 rounded-md", // Adjusted gap and padding
-        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Theme hover
-        isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground", // Theme active/inactive
+        "flex items-center justify-start gap-3 group/sidebar py-2 px-2 rounded-md", 
+        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", 
+        isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground", 
         className
       )}
       {...props}
@@ -218,8 +216,7 @@ export const SidebarLink = ({
         }}
         className={cn(
             "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0",
-            isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground", // Theme active/inactive text
-            // Conditional class for desktop collapsed state
+            isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground", 
              (animate && !open) ? "md:hidden" : ""
         )}
       >
@@ -228,3 +225,4 @@ export const SidebarLink = ({
     </NextLink>
   );
 };
+
