@@ -6,15 +6,15 @@ import { cn } from "@/lib/utils";
 import { SidebarLink } from "@/components/ui/sidebar"; 
 import type { SidebarLinkItem } from "@/components/ui/sidebar"; 
 import Logo from "@/components/icons/logo";
-import { ScanLine, Sparkles, BarChart3, HelpCircle, LogOut, LayoutDashboard } from "lucide-react"; // Added LayoutDashboard, Sparkles, BarChart3, LogOut
+import { ScanLine, Sparkles, BarChart3, HelpCircle, LogIn, LayoutDashboard } from "lucide-react"; // Changed LogOut to LogIn
 import { useSidebar } from "@/components/ui/sidebar"; 
 import React from "react"; 
 
 const navItems: SidebarLinkItem[] = [ 
   { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard /> },
   { href: "/smart-scan", label: "Smart Scan", icon: <ScanLine /> },
-  { href: "/jargon-explanation", label: "Clarity Tool", icon: <Sparkles /> }, // Icon updated
-  { href: "/contract-analysis", label: "Compare & Refine", icon: <BarChart3 /> }, // Icon updated
+  { href: "/jargon-explanation", label: "Clarity Tool", icon: <Sparkles /> },
+  { href: "/contract-analysis", label: "Compare & Refine", icon: <BarChart3 /> },
   { href: "/ask-a-question", label: "Ask A Question", icon: <HelpCircle /> }, 
 ];
 
@@ -36,14 +36,14 @@ export default function SidebarNav() {
           <SidebarLink
             key={item.href}
             link={item}
-            isActive={pathname === item.href || (pathname === '/' && item.href === '/dashboard')} // Updated default active
+            isActive={pathname === item.href || (pathname === '/' && item.href === '/dashboard')}
           />
         ))}
       </nav>
-      <div className="mt-auto p-2"> {/* Logout button section */}
+      <div className="mt-auto p-2"> {/* Login button section */}
         <SidebarLink
-          link={{ href: "#", label: "Logout", icon: <LogOut /> }}
-          isActive={false} // Assuming logout is not an "active" page
+          link={{ href: "#", label: "Login", icon: <LogIn /> }} // Changed label to Login and icon to LogIn
+          isActive={false} 
         />
       </div>
     </div>

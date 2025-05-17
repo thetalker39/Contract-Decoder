@@ -3,6 +3,8 @@
 
 import { RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 interface FavorabilityGaugeProps {
   score: number; // Score from 1 to 100
@@ -25,7 +27,7 @@ const FavorabilityGauge: React.FC<FavorabilityGaugeProps> = ({ score }) => {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="text-center">Contract Favorability Score</CardTitle>
+        <CardTitle className="text-center text-primary">Contract Favorability Score</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center">
         <div style={{ width: '100%', height: 200 }}>
@@ -76,9 +78,21 @@ const FavorabilityGauge: React.FC<FavorabilityGaugeProps> = ({ score }) => {
             </RadialBarChart>
           </ResponsiveContainer>
         </div>
-        <p className="mt-2 text-sm text-muted-foreground text-center">
-          {normalizedScore < 33 ? "Potentially Unfavorable" : normalizedScore < 66 ? "Moderately Favorable" : "Highly Favorable"}
-        </p>
+        <div className="mt-2 flex items-center justify-center space-x-1">
+          <p className="text-sm text-muted-foreground text-center">
+            {normalizedScore < 33 ? "Potentially Unfavorable" : normalizedScore < 66 ? "Moderately Favorable" : "Highly Favorable"}
+          </p>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>This score (0-100) indicates how favorable the AI deems the contract terms for the Producer.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </CardContent>
     </Card>
   );
