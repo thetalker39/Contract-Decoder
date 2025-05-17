@@ -6,7 +6,7 @@ import NextLink, { type LinkProps as NextLinkProps } from "next/link";
 import React, { useState, createContext, useContext, useRef, useEffect, cloneElement, isValidElement } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { usePathname } from "next/navigation"; // For isActive
+import { usePathname } from "next/navigation"; 
 
 export interface SidebarLinkItem {
   label: string;
@@ -32,7 +32,6 @@ export const useSidebar = () => {
   return context;
 };
 
-// Renamed from SidebarProvider to InternalSidebarProvider to avoid conflict
 const InternalSidebarProvider = ({
   children,
   open: openProp,
@@ -44,7 +43,7 @@ const InternalSidebarProvider = ({
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
 }) => {
-  const [openState, setOpenState] = useState(false); // Default to closed
+  const [openState, setOpenState] = useState(false); 
 
   const open = openProp !== undefined ? openProp : openState;
   const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
@@ -92,17 +91,17 @@ export const SidebarBody = ({
   logoSlotMobile,
   children,
   className,
-  ...rest // All other props for DesktopSidebar's motion.div
+  ...rest 
 }: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => {
   
   const mobileSidebarProps = {
-    className: cn(className), // Pass className intended for the mobile header bar
+    className: cn(className), 
     logoSlotMobile,
-    children, // Children are passed to be rendered inside the mobile sheet
+    children, 
   };
 
   const desktopSidebarProps = {
-    className: cn(className), // Pass className intended for the DesktopSidebar's motion.div
+    className: cn(className), 
     children,
     ...rest, 
   };
@@ -119,8 +118,9 @@ export const SidebarBody = ({
 export const DesktopSidebar = ({
   className,
   children,
-  ...rest // Framer Motion props from SidebarBody
-}: React.ComponentProps<typeof motion.div>) => { // logoSlotMobile is not expected here
+  logoSlotMobile: _logoSlotMobile, // Consume but ignore logoSlotMobile
+  ...rest 
+}: React.ComponentProps<typeof motion.div> & { logoSlotMobile?: React.ReactNode }) => {
   const { open, setOpen, animate } = useSidebar();
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -225,17 +225,15 @@ export const MobileSidebar = ({
 interface SidebarLinkProps extends Omit<NextLinkProps, 'href'> {
   link: SidebarLinkItem;
   className?: string;
-  isActive?: boolean; // Keep this prop if sidebar-nav calculates it
+  isActive?: boolean; 
 }
 
 export const SidebarLink = ({ link, className, isActive: isActiveProp, ...props }: SidebarLinkProps) => {
   const { open, animate, setOpen } = useSidebar();
   const [isMounted, setIsMounted] = useState(false);
-  const pathname = usePathname(); // Get current path
+  const pathname = usePathname(); 
 
-  // Determine active state internally if not passed, or use passed prop
   const isActive = isActiveProp !== undefined ? isActiveProp : (pathname === link.href || (pathname === '/' && link.href === '/dashboard'));
-
 
   useEffect(() => {
     setIsMounted(true);
@@ -248,17 +246,15 @@ export const SidebarLink = ({ link, className, isActive: isActiveProp, ...props 
   };
 
   const linkBaseClasses = "flex items-center justify-start gap-3 group/sidebar py-2 px-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
-  // Apply active classes only if mounted and active
   const activeStateLinkClasses = isMounted && isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground";
   
   const iconBaseClasses = "h-5 w-5 flex-shrink-0";
-  // Apply active icon classes only if mounted and active
   const activeStateIconClasses = isMounted && isActive 
     ? "text-sidebar-primary-foreground" 
     : "text-sidebar-foreground group-hover/sidebar:text-sidebar-accent-foreground";
 
-  const labelBaseClasses = "text-sm group-hover/sidebar:translate-x-1 whitespace-pre overflow-hidden";
-  // Apply active label classes only if mounted and active
+  // Updated: text-sm to text-base
+  const labelBaseClasses = "text-base group-hover/sidebar:translate-x-1 whitespace-pre overflow-hidden"; 
   const activeStateLabelClasses = isMounted && isActive ? "text-sidebar-primary-foreground font-medium" : "text-sidebar-foreground";
 
   return (
@@ -280,7 +276,6 @@ export const SidebarLink = ({ link, className, isActive: isActiveProp, ...props 
         )
       }) : link.icon}
 
-      {/* Conditionally render the span for the label based on isMounted and sidebar state */}
       {isMounted && (!animate || open) && (
         <span
           className={cn(labelBaseClasses, activeStateLabelClasses)}
