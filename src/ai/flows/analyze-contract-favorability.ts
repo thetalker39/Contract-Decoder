@@ -74,5 +74,3 @@ const analyzeContractFavorabilityFlow = ai.defineFlow(
     return output!;
   }
 );
-
-```
