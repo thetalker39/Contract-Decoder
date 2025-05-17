@@ -14,7 +14,7 @@ import { analyzeContractFavorability } from "@/ai/flows/analyze-contract-favorab
 import type { AnalyzeContractFavorabilityOutput } from "@/ai/flows/analyze-contract-favorability";
 import { rewriteContractTerms } from "@/ai/flows/rewrite-contract-terms";
 import type { RewriteContractTermsInput, RewriteContractTermsOutput } from "@/ai/flows/rewrite-contract-terms";
-import { Loader2, Copy, FileText } from "lucide-react"; // Added FileText for summary icon
+import { Loader2, Copy, FileText, BarChart3 } from "lucide-react"; 
 import { useToast } from "@/hooks/use-toast";
 import { ListItems, ListItem } from "@/components/ui/list";
 
@@ -127,7 +127,10 @@ export default function ContractAnalysisPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Contract Comparison &amp; Refinement</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-primary flex items-center gap-2">
+          <BarChart3 className="h-8 w-8" />
+          Contract Comparison &amp; Refinement
+        </h1>
         <p className="text-muted-foreground">
           Analyze contract favorability, get advice, and rewrite terms for a better deal.
         </p>

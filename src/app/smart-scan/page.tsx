@@ -8,9 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { summarizeContract } from "@/ai/flows/summarize-contract";
 import type { SummarizeContractOutput } from "@/ai/flows/summarize-contract";
-import { Loader2 } from "lucide-react";
+import { Loader2, ScanLine } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ListItems, ListItem, ListHeader, ListGroup } from "@/components/ui/list"; // Assuming list.tsx provides these
+import { ListItems, ListItem, ListHeader, ListGroup } from "@/components/ui/list"; 
 
 // Default contract text is now empty
 const defaultContractText = ``;
@@ -123,7 +123,10 @@ export default function SmartScanPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Smart Contract Scan</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-primary flex items-center gap-2">
+          <ScanLine className="h-8 w-8" />
+          Smart Contract Scan
+        </h1>
         <p className="text-muted-foreground">
           Upload or paste your contract to extract key terms, summarize clauses, and identify unusual provisions.
         </p>

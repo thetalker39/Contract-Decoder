@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X } from 'lucide-react';
+import { X, BookOpen } from 'lucide-react';
 
 interface BlogPost {
   id: string;
@@ -149,7 +149,10 @@ export default function LearnCenterPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-primary">Learn Center</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <BookOpen className="h-8 w-8" />
+          Learn Center
+        </h1>
         <p className="text-muted-foreground">
           Expand your knowledge on music contracts and industry insights.
         </p>

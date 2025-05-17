@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { explainLegalJargon } from "@/ai/flows/explain-legal-jargon";
 import type { ExplainLegalJargonOutput, ExplainLegalJargonInput } from "@/ai/flows/explain-legal-jargon";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ListItems, ListItem } from "@/components/ui/list";
 
@@ -58,7 +58,10 @@ export default function JargonExplanationPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Clarity Tool</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-primary flex items-center gap-2">
+          <Sparkles className="h-8 w-8" />
+          Clarity Tool
+        </h1>
         <p className="text-muted-foreground">
           Explain legal jargon in contracts with adjustable explanation levels.
         </p>

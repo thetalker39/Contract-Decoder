@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { answerUserQuestion } from "@/ai/flows/answer-question-flow"; // New flow
 import type { AnswerUserQuestionOutput } from "@/ai/flows/answer-question-flow"; // New flow types
-import { Loader2 } from "lucide-react";
+import { Loader2, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ListItems, ListItem } from "@/components/ui/list";
 
@@ -54,7 +54,10 @@ export default function AskAQuestionPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Ask A Question</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-black flex items-center gap-2">
+          <HelpCircle className="h-8 w-8" />
+          Ask A Question
+        </h1>
         <p className="text-muted-foreground">
           Get suggestions and answers to your contract-related questions.
         </p>
