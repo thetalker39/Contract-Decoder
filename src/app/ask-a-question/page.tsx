@@ -54,8 +54,8 @@ export default function AskAQuestionPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black flex items-center gap-2">
-          <HelpCircle className="h-8 w-8" />
+        <h1 className="text-3xl font-bold tracking-tight text-primary flex items-center gap-2"> {/* Changed to text-primary */}
+          <HelpCircle className="h-8 w-8 text-primary" /> {/* Changed to text-primary */}
           Ask A Question
         </h1>
         <p className="text-muted-foreground">
@@ -65,7 +65,7 @@ export default function AskAQuestionPage() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="text-card-foreground">Enter Question Text</CardTitle>
+          <CardTitle className="text-card-foreground">Enter Question Text</CardTitle> {/* This remains black as per previous request */}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">

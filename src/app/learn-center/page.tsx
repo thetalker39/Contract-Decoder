@@ -149,8 +149,8 @@ export default function LearnCenterPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-          <BookOpen className="h-8 w-8" />
+        <h1 className="text-3xl font-bold tracking-tight text-primary flex items-center gap-2"> {/* Changed to text-primary */}
+          <BookOpen className="h-8 w-8 text-primary" /> {/* Changed to text-primary */}
           Learn Center
         </h1>
         <p className="text-muted-foreground">
