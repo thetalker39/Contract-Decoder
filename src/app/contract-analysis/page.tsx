@@ -14,7 +14,7 @@ import { analyzeContractFavorability } from "@/ai/flows/analyze-contract-favorab
 import type { AnalyzeContractFavorabilityOutput } from "@/ai/flows/analyze-contract-favorability";
 import { rewriteContractTerms } from "@/ai/flows/rewrite-contract-terms";
 import type { RewriteContractTermsInput, RewriteContractTermsOutput } from "@/ai/flows/rewrite-contract-terms";
-import { Loader2, Copy } from "lucide-react";
+import { Loader2, Copy, FileText } from "lucide-react"; // Added FileText for summary icon
 import { useToast } from "@/hooks/use-toast";
 import { ListItems, ListItem } from "@/components/ui/list";
 
@@ -51,7 +51,7 @@ export default function ContractAnalysisPage() {
       console.error(e);
       const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
       setCompareError(errorMessage);
-      toast({ title: "Error Comparing Contract", description: errorMessage, variant: "destructive" });
+      toast({ title: "Error Analyzing Contract", description: errorMessage, variant: "destructive" });
     } finally {
       setIsCompareLoading(false);
     }
@@ -74,7 +74,7 @@ export default function ContractAnalysisPage() {
     const input: RewriteContractTermsInput = { 
       contractText, 
       aggressiveRewrite, 
-      industryStandardInfo: undefined, // Or pass relevant info if available
+      industryStandardInfo: undefined, 
     };
 
     if (amount !== undefined) {
@@ -208,7 +208,6 @@ export default function ContractAnalysisPage() {
         </Card>
       )}
       
-      {/* Moved Rewritten Contract section below Refine Options and buttons, but before Compare results */}
       {refineError && (
         <Card className="border-destructive shadow-lg mt-6">
           <CardHeader><CardTitle className="text-destructive">Refine Error</CardTitle></CardHeader>
@@ -236,24 +235,39 @@ export default function ContractAnalysisPage() {
         </Card>
       )}
 
-      {/* Compare Results Section - Appears after refine results if refine was triggered, or independently */}
       {compareResult && (
         <>
           <div className="my-6"> 
               <FavorabilityGauge score={compareResult.favorabilityScore} />
           </div>
+
+          {compareResult.overallSummary && (
+            <Card className="shadow-lg">
+              <CardHeader className="flex flex-row items-start gap-3"> 
+                <FileText className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+                <div>
+                  <CardTitle className="text-primary">Overall Contract Summary &amp; Unfavorable Points</CardTitle>
+                  <CardDescription>A high-level overview of the agreement's key issues.</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{compareResult.overallSummary}</p>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="space-y-6">
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle>Contract Analysis: General Advice</CardTitle>
+                <CardTitle>Flagged Clauses</CardTitle>
               </CardHeader>
               <CardContent>
-                {renderAnalysisList(compareResult.generalAdvice, "general-advice")}
+                {renderAnalysisList(compareResult.generalAdvice, "flagged-clauses")}
               </CardContent>
             </Card>
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle>Contract Analysis: Recommendations</CardTitle>
+                <CardTitle>Recommendations &amp; Suggested Improvements</CardTitle>
               </CardHeader>
               <CardContent>
                  {renderAnalysisList(compareResult.recommendations, "recommendations")}
