@@ -3,7 +3,8 @@
 'use server';
 
 /**
- * @fileOverview Rewrites a contract with more favorable terms for a producer or artist.
+ * @fileOverview Rewrites a contract with more favorable terms for a producer or artist,
+ * potentially incorporating a user-specified desired amount for a fee or advance.
  *
  * - rewriteContractTerms - A function that rewrites contract terms.
  * - RewriteContractTermsInput - The input type for the rewriteContractTerms function.
@@ -24,6 +25,8 @@ const RewriteContractTermsInputSchema = z.object({
     .string()
     .optional()
     .describe('Industry standard information to compare the contract against. This can be used to guide the rewrite towards more common and fair terms.'),
+  desiredAmount: z.number().optional().describe('A specific monetary amount the user desires to be incorporated into relevant clauses, such as an advance or fee.'),
+  isRecoupable: z.boolean().optional().describe('If a desiredAmount is provided, specifies whether it should be treated as a recoupable advance (true) or a non-recoupable fee (false).'),
 });
 
 export type RewriteContractTermsInput = z.infer<
@@ -33,7 +36,7 @@ export type RewriteContractTermsInput = z.infer<
 const RewriteContractTermsOutputSchema = z.object({
   rewrittenContract: z
     .string()
-    .describe('The rewritten contract with more favorable terms. The rewrite should be comprehensive and detailed, addressing specific clauses to improve them based on industry standards if provided, or general fairness principles.'),
+    .describe('The rewritten contract with more favorable terms. The rewrite should be comprehensive and detailed, addressing specific clauses to improve them based on industry standards if provided, or general fairness principles. If a desiredAmount is provided, it should be skillfully woven into appropriate clauses (e.g., advance, fee payment).'),
 });
 
 export type RewriteContractTermsOutput = z.infer<
@@ -72,7 +75,17 @@ Rewrite Instructions:
     {{/if}}
 4.  **Clarity and Detail**: Ensure the rewritten contract is clear, unambiguous, and detailed. Vague terms should be made specific.
 5.  **Maintain Contract Integrity**: While making it more favorable, ensure the rewritten contract remains a legally sound and coherent document.
-6.  **Output**: Provide the complete text of the rewritten contract.
+6.  **Incorporate User Preferences (If Provided)**:
+    {{#if desiredAmount}}
+    The user has specified a desired monetary amount of \${{{desiredAmount}}}.
+      {{#if isRecoupable}}
+      This amount should be integrated into a relevant clause (e.g., producer advance, artist advance) as a **recoupable advance**.
+      {{else}}
+      This amount should be integrated into a relevant clause (e.g., production fee, creative fee) as a **non-recoupable fee**.
+      {{/if}}
+    Ensure this amount is naturally and appropriately incorporated into the rewritten contract text, replacing or adjusting existing figures where suitable.
+    {{/if}}
+7.  **Output**: Provide the complete text of the rewritten contract.
 
 The goal is a significantly improved contract for the artist/producer. Be thorough and meticulous in your rewriting.
 `,
@@ -89,3 +102,5 @@ const rewriteContractTermsFlow = ai.defineFlow(
     return output!;
   }
 );
+
+```

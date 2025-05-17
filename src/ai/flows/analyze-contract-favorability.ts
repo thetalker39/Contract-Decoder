@@ -25,7 +25,7 @@ const AnalyzeContractFavorabilityOutputSchema = z.object({
     .max(100)
     .describe('A score from 1-100 representing the favorability of the contract towards the user.'),
   generalAdvice: z.string().describe('General advice regarding the contract, with each point on a new line, referencing specific clauses where applicable and explaining why it might be unfavorable compared to industry standards.'),
-  recommendations: z.string().describe('Specific, actionable recommendations for the user regarding the contract, with each point on a new line, referencing specific clauses and explaining why changes are needed relative to industry standards.'),
+  recommendations: z.string().describe('Specific, actionable recommendations for the user regarding the contract, with each point on a new line, referencing specific clauses, explaining why changes are needed relative to industry standards, and suggesting specific negotiable figures or ranges where applicable (e.g., "Producer Advance: Recommend negotiating for $2,500 - $5,000 instead of $X").'),
 });
 export type AnalyzeContractFavorabilityOutput = z.infer<typeof AnalyzeContractFavorabilityOutputSchema>;
 
@@ -39,7 +39,7 @@ const analyzeContractFavorabilityPrompt = ai.definePrompt({
   name: 'analyzeContractFavorabilityPrompt',
   input: {schema: AnalyzeContractFavorabilityInputSchema},
   output: {schema: AnalyzeContractFavorabilityOutputSchema},
-  prompt: `You are an AI expert in contract law with deep knowledge of industry standards. Analyze the following contract text and determine its favorability towards the user (e.g., an artist or producer).
+  prompt: `You are an AI expert in contract law with deep knowledge of industry standards, particularly in music and creative fields. Analyze the following contract text and determine its favorability towards the user (e.g., an artist or producer).
 
 Contract Text:
 {{{contractText}}}
@@ -54,6 +54,7 @@ Your analysis should include:
 3.  **Recommendations**: Offer specific, actionable recommendations for the user. For each recommendation:
     *   Clearly reference the specific clause or section.
     *   Suggest concrete changes or points for negotiation.
+    *   **Crucially, where monetary values, percentages, or quantifiable terms are discussed (e.g., advances, royalties, deadlines, term lengths), provide specific, justifiable numerical ranges or figures that would be considered more favorable or aligned with industry standards. For example: "Clause 4.2 (Advance): The offered advance of $500 is significantly below industry standard for this type of project. Recommend negotiating for an advance in the range of $2,500 - $5,000." or "Section 5 (Royalties): The 10% royalty rate is low. Aim for a rate between 15-20%."**
     *   Explain how these changes would align the contract more closely with industry standards or make it fairer for the user.
     *   Present each recommendation on a new line.
 
@@ -73,3 +74,5 @@ const analyzeContractFavorabilityFlow = ai.defineFlow(
     return output!;
   }
 );
+
+```

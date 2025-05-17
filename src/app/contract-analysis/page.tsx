@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -15,11 +16,13 @@ import { rewriteContractTerms } from "@/ai/flows/rewrite-contract-terms";
 import type { RewriteContractTermsOutput } from "@/ai/flows/rewrite-contract-terms";
 import { Loader2, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ListItems, ListItem, ListHeader, ListGroup } from "@/components/ui/list";
+import { ListItems, ListItem } from "@/components/ui/list";
 
 export default function ContractAnalysisPage() {
   const [contractText, setContractText] = useState<string>("");
   const [aggressiveRewrite, setAggressiveRewrite] = useState<boolean>(false);
+  const [desiredAmount, setDesiredAmount] = useState<string>("");
+  const [isRecoupable, setIsRecoupable] = useState<boolean>(true); // Default to recoupable advance
   
   const [isCompareLoading, setIsCompareLoading] = useState<boolean>(false);
   const [isRefineLoading, setIsRefineLoading] = useState<boolean>(false);
@@ -39,6 +42,7 @@ export default function ContractAnalysisPage() {
     }
     setIsCompareLoading(true);
     setCompareResult(null);
+    setRefineResult(null); // Clear previous refine results if comparing again
     setCompareError(null);
     try {
       const output = await analyzeContractFavorability({ contractText });
@@ -61,8 +65,20 @@ export default function ContractAnalysisPage() {
     setIsRefineLoading(true);
     setRefineResult(null);
     setRefineError(null);
+
+    let amount: number | undefined = parseFloat(desiredAmount);
+    if (isNaN(amount) || desiredAmount.trim() === "") {
+      amount = undefined;
+    }
+    
     try {
-      const output = await rewriteContractTerms({ contractText, aggressiveRewrite, industryStandardInfo: undefined });
+      const output = await rewriteContractTerms({ 
+        contractText, 
+        aggressiveRewrite, 
+        industryStandardInfo: undefined, // Or pass relevant info if available
+        desiredAmount: amount,
+        isRecoupable: amount !== undefined ? isRecoupable : undefined, // Only pass isRecoupable if amount is provided
+      });
       setRefineResult(output);
     } catch (e) {
       console.error(e);
@@ -121,12 +137,43 @@ export default function ContractAnalysisPage() {
             placeholder="Paste your contract text here..."
             value={contractText}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContractText(e.target.value)}
-            rows={15}
+            rows={10} // Reduced rows slightly
             className="border-border focus:ring-ring"
             disabled={isLoading}
           />
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center space-x-2">
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle>Refine Options</CardTitle>
+          <CardDescription>Optionally provide a desired amount and its type for the refined contract.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="desiredAmount" className="text-foreground">Desired Amount (e.g., 5000)</Label>
+            <Input
+              id="desiredAmount"
+              type="number"
+              placeholder="Enter amount"
+              value={desiredAmount}
+              onChange={(e) => setDesiredAmount(e.target.value)}
+              className="border-border focus:ring-ring"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isRecoupable"
+              checked={isRecoupable}
+              onCheckedChange={setIsRecoupable}
+              disabled={isLoading || desiredAmount.trim() === ""}
+            />
+            <Label htmlFor="isRecoupable" className="text-foreground">
+              {isRecoupable ? "Treat as Recoupable Advance" : "Treat as Non-Recoupable Fee"}
+            </Label>
+          </div>
+           <div className="flex items-center space-x-2 pt-2">
               <Switch
                 id="aggressiveRewrite"
                 checked={aggressiveRewrite}
@@ -135,53 +182,52 @@ export default function ContractAnalysisPage() {
               />
               <Label htmlFor="aggressiveRewrite" className="text-foreground">Aggressive Rewrite</Label>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              <Button onClick={handleCompare} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
-                {isCompareLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Compare
-              </Button>
-              <Button onClick={handleRefine} variant="outline" className="w-full sm:w-auto border-accent text-accent hover:bg-accent hover:text-accent-foreground" disabled={isLoading}>
-                {isRefineLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Refine
-              </Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
+      
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2 pt-2">
+          <Button onClick={handleCompare} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isLoading}>
+            {isCompareLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Analyze Contract
+          </Button>
+          <Button onClick={handleRefine} variant="outline" className="w-full sm:w-auto border-accent text-accent hover:bg-accent hover:text-accent-foreground" disabled={isLoading}>
+            {isRefineLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Refine Contract
+          </Button>
+      </div>
+
 
       {compareError && (
-        <Card className="border-destructive shadow-lg">
-          <CardHeader><CardTitle className="text-destructive">Compare Error</CardTitle></CardHeader>
+        <Card className="border-destructive shadow-lg mt-6">
+          <CardHeader><CardTitle className="text-destructive">Analysis Error</CardTitle></CardHeader>
           <CardContent><p className="text-destructive-foreground">{compareError}</p></CardContent>
         </Card>
       )}
 
-      {/* Favorability Gauge now full width above analysis */}
       {compareResult && (
-        <div className="mb-6"> {/* Add margin bottom for spacing */}
-            <FavorabilityGauge score={compareResult.favorabilityScore} />
-        </div>
-      )}
-
-      {compareResult && (
-        <div className="space-y-6"> {/* Use space-y for stacking cards */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>Contract Analysis: General Advice</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {renderAnalysisList(compareResult.generalAdvice, "general-advice")}
-            </CardContent>
-          </Card>
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>Contract Analysis: Recommendations</CardTitle>
-            </CardHeader>
-            <CardContent>
-               {renderAnalysisList(compareResult.recommendations, "recommendations")}
-            </CardContent>
-          </Card>
-        </div>
+        <>
+          <div className="my-6">
+              <FavorabilityGauge score={compareResult.favorabilityScore} />
+          </div>
+          <div className="space-y-6">
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle>Contract Analysis: General Advice</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {renderAnalysisList(compareResult.generalAdvice, "general-advice")}
+              </CardContent>
+            </Card>
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle>Contract Analysis: Recommendations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                 {renderAnalysisList(compareResult.recommendations, "recommendations")}
+              </CardContent>
+            </Card>
+          </div>
+        </>
       )}
 
       {refineError && (
@@ -213,3 +259,5 @@ export default function ContractAnalysisPage() {
     </div>
   );
 }
+
+```
