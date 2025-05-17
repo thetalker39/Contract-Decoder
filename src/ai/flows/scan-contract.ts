@@ -1,3 +1,4 @@
+
 // src/ai/flows/scan-contract.ts
 'use server';
 
@@ -20,7 +21,7 @@ const ScanContractInputSchema = z.object({
 export type ScanContractInput = z.infer<typeof ScanContractInputSchema>;
 
 const ScanContractOutputSchema = z.object({
-  summary: z.string().describe('A summary of the contract, including key terms, clause summaries, and identified unusual provisions.'),
+  summary: z.string().describe('A summary of the contract, including key terms, clause summaries, and identified unusual provisions, considering if the contract is for an artist or producer.'),
 });
 export type ScanContractOutput = z.infer<typeof ScanContractOutputSchema>;
 
@@ -35,10 +36,11 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert legal contract analyst.
 
   Your task is to analyze the provided contract text and generate a comprehensive summary.
+  First, try to determine if the contract is primarily for an **artist** or a **producer**. This understanding should subtly guide your analysis.
   The summary should include the following:
-  - Key terms and definitions
-  - Summaries of each clause or section
-  - Identification of any unusual or non-standard provisions
+  - Key terms and definitions (considering their relevance for an artist or producer)
+  - Summaries of each clause or section (highlighting implications for the likely role)
+  - Identification of any unusual or non-standard provisions (when compared to typical agreements for an artist or producer)
 
   Contract Text: {{{contractText}}}
 

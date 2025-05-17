@@ -24,7 +24,7 @@ const RewriteContractTermsInputSchema = z.object({
   industryStandardInfo: z
     .string()
     .optional()
-    .describe('Industry standard information to compare the contract against. This can be used to guide the rewrite towards more common and fair terms.'),
+    .describe('Industry standard information to compare the contract against. This can be used to guide the rewrite towards more common and fair terms for an artist or producer.'),
   desiredAmount: z.number().optional().describe('A specific monetary amount the user desires to be incorporated into relevant clauses, such as an advance or fee.'),
   isRecoupable: z.boolean().optional().describe('If a desiredAmount is provided, specifies whether it should be treated as a recoupable advance (true) or a non-recoupable fee (false).'),
 });
@@ -36,7 +36,7 @@ export type RewriteContractTermsInput = z.infer<
 const RewriteContractTermsOutputSchema = z.object({
   rewrittenContract: z
     .string()
-    .describe('The rewritten contract with more favorable terms. The rewrite should be comprehensive and detailed, addressing specific clauses to improve them based on industry standards if provided, or general fairness principles. If a desiredAmount is provided, it should be skillfully woven into appropriate clauses (e.g., advance, fee payment).'),
+    .describe('The rewritten contract with more favorable terms. The rewrite should be comprehensive and detailed, addressing specific clauses to improve them based on industry standards (for an artist or producer) if provided, or general fairness principles. If a desiredAmount is provided, it should be skillfully woven into appropriate clauses (e.g., advance, fee payment).'),
 });
 
 export type RewriteContractTermsOutput = z.infer<
@@ -53,20 +53,21 @@ const rewriteContractTermsPrompt = ai.definePrompt({
   name: 'rewriteContractTermsPrompt',
   input: {schema: RewriteContractTermsInputSchema},
   output: {schema: RewriteContractTermsOutputSchema},
-  prompt: `You are an expert contract lawyer specializing in music contracts, skilled at drafting clear, fair, and detailed contract language.
-Your task is to rewrite the provided contract text to be more favorable for a producer or artist.
+  prompt: `You are an expert contract lawyer specializing in music contracts, skilled at drafting clear, fair, and detailed contract language for both artists and producers.
+Your task is to rewrite the provided contract text to be more favorable.
+First, determine if the original contract is primarily for an **artist** or a **producer**. This will guide your approach to rewriting terms according to relevant industry standards.
 
 Original Contract text:
 {{{contractText}}}
 
 {{#if industryStandardInfo}}
-Consider the following industry standard information when rewriting the contract:
+Consider the following industry standard information when rewriting the contract, tailoring it to whether this is for an artist or producer:
 {{{industryStandardInfo}}}
 {{/if}}
 
 Rewrite Instructions:
 1.  **Identify Unfavorable Clauses**: Carefully review the original contract and identify clauses that are unfavorable to the artist/producer.
-2.  **Propose Favorable Alternatives**: For each unfavorable clause, draft a rewritten version that is more equitable and aligns better with the artist's/producer's interests. If industry standards are provided, use them as a guide.
+2.  **Propose Favorable Alternatives**: For each unfavorable clause, draft a rewritten version that is more equitable and aligns better with the artist's/producer's interests, reflecting industry standards for their role. If industry standards are provided, use them as a guide.
 3.  **Level of Aggression**:
     {{#if aggressiveRewrite}}
     You will perform an **aggressive rewrite**. This means you should not hesitate to significantly alter or remove clauses that are highly detrimental. Be bold in your revisions to strongly favor the artist/producer.
@@ -84,10 +85,12 @@ Rewrite Instructions:
       This amount should be integrated into a relevant clause (e.g., production fee, creative fee) as a **non-recoupable fee**.
       {{/if}}
     Ensure this amount is naturally and appropriately incorporated into the rewritten contract text, replacing or adjusting existing figures where suitable.
+    {{else}}
+    If the contract is for a **producer** and involves a fee or advance, and no specific desired amount is provided by the user, consider that a typical industry standard range for producer advances/fees is **$2,500 - $5,000**. Aim to rewrite relevant clauses to reflect compensation within or towards this range, assuming it's appropriate for the context of the contract.
     {{/if}}
 7.  **Output**: Provide the complete text of the rewritten contract.
 
-The goal is a significantly improved contract for the artist/producer. Be thorough and meticulous in your rewriting.
+The goal is a significantly improved contract for the artist/producer. Be thorough and meticulous in your rewriting, always considering the specific role of the party.
 `,
 });
 
