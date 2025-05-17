@@ -11,6 +11,7 @@ import { explainLegalJargon } from "@/ai/flows/explain-legal-jargon";
 import type { ExplainLegalJargonOutput, ExplainLegalJargonInput } from "@/ai/flows/explain-legal-jargon";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ListItems, ListItem } from "@/components/ui/list";
 
 type ExplanationLevel = ExplainLegalJargonInput['explanationLevel'];
 
@@ -27,7 +28,7 @@ export default function JargonExplanationPage() {
     if (!contractText.trim()) {
       toast({
         title: "Input Required",
-        description: "Please paste your contract text.",
+        description: "Please paste your contract text or specific jargon.",
         variant: "destructive",
       });
       return;
@@ -52,6 +53,8 @@ export default function JargonExplanationPage() {
     }
   };
 
+  const explanationPoints = result?.explanation.split('\n').filter(point => point.trim() !== '');
+
   return (
     <div className="container mx-auto py-8 space-y-8">
       <header className="space-y-2">
@@ -63,15 +66,15 @@ export default function JargonExplanationPage() {
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Enter Contract Text &amp; Select Level</CardTitle>
+          <CardTitle>Enter Contract Text or Jargon &amp; Select Level</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <Textarea
-              placeholder="Paste contract text with jargon here..."
+              placeholder="Paste contract text with jargon or specific legal terms here..."
               value={contractText}
               onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContractText(e.target.value)}
-              rows={15}
+              rows={10} // Reduced rows as it can be specific terms
               className="border-border focus:ring-ring"
               disabled={isLoading}
             />
@@ -111,16 +114,20 @@ export default function JargonExplanationPage() {
         </Card>
       )}
 
-      {result && (
+      {explanationPoints && explanationPoints.length > 0 && (
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>Explanation</CardTitle>
             <CardDescription>Legal jargon explained at the <span className="font-semibold">{explanationLevel}</span> level.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm dark:prose-invert max-w-none p-4 bg-muted/50 rounded-md text-foreground whitespace-pre-wrap">
-              {result.explanation}
-            </div>
+            <ListItems>
+              {explanationPoints.map((point, index) => (
+                <ListItem key={`explanation-${index}`} id={`explanation-item-${index}`} className="bg-card">
+                  <p className="m-0 text-sm text-foreground whitespace-pre-wrap">{point}</p>
+                </ListItem>
+              ))}
+            </ListItems>
           </CardContent>
         </Card>
       )}

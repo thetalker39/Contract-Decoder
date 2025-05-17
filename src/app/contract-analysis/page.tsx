@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import type { ChangeEvent, FormEvent } from "react";
+import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { rewriteContractTerms } from "@/ai/flows/rewrite-contract-terms";
 import type { RewriteContractTermsOutput } from "@/ai/flows/rewrite-contract-terms";
 import { Loader2, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ListItems, ListItem, ListHeader, ListGroup } from "@/components/ui/list";
 
 export default function ContractAnalysisPage() {
   const [contractText, setContractText] = useState<string>("");
@@ -39,9 +40,6 @@ export default function ContractAnalysisPage() {
     setIsCompareLoading(true);
     setCompareResult(null);
     setCompareError(null);
-    // Optionally clear refine result when re-comparing
-    // setRefineResult(null); 
-    // setRefineError(null);
     try {
       const output = await analyzeContractFavorability({ contractText });
       setCompareResult(output);
@@ -64,7 +62,6 @@ export default function ContractAnalysisPage() {
     setRefineResult(null);
     setRefineError(null);
     try {
-      // industryStandardInfo is optional, pass undefined if not available
       const output = await rewriteContractTerms({ contractText, aggressiveRewrite, industryStandardInfo: undefined });
       setRefineResult(output);
     } catch (e) {
@@ -89,6 +86,22 @@ export default function ContractAnalysisPage() {
   };
 
   const isLoading = isCompareLoading || isRefineLoading;
+
+  const renderAnalysisList = (text: string | undefined, sectionId: string) => {
+    if (!text) return null;
+    const points = text.split('\n').filter(point => point.trim() !== '');
+    if (points.length === 0) return <p className="text-muted-foreground">No specific points provided for this section.</p>;
+
+    return (
+      <ListItems>
+        {points.map((point, index) => (
+          <ListItem key={`${sectionId}-${index}`} id={`${sectionId}-item-${index}`} className="bg-card">
+            <p className="m-0 text-sm text-foreground whitespace-pre-wrap">{point}</p>
+          </ListItem>
+        ))}
+      </ListItems>
+    );
+  };
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -143,38 +156,43 @@ export default function ContractAnalysisPage() {
         </Card>
       )}
 
+      {/* Favorability Gauge now full width above analysis */}
       {compareResult && (
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
+        <div className="mb-6"> {/* Add margin bottom for spacing */}
             <FavorabilityGauge score={compareResult.favorabilityScore} />
-          </div>
-          <Card className="md:col-span-2 shadow-lg">
+        </div>
+      )}
+
+      {compareResult && (
+        <div className="space-y-6"> {/* Use space-y for stacking cards */}
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Contract Analysis</CardTitle>
+              <CardTitle>Contract Analysis: General Advice</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">General Advice:</h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">{compareResult.generalAdvice}</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">Recommendations:</h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">{compareResult.recommendations}</p>
-              </div>
+            <CardContent>
+              {renderAnalysisList(compareResult.generalAdvice, "general-advice")}
+            </CardContent>
+          </Card>
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Contract Analysis: Recommendations</CardTitle>
+            </CardHeader>
+            <CardContent>
+               {renderAnalysisList(compareResult.recommendations, "recommendations")}
             </CardContent>
           </Card>
         </div>
       )}
 
       {refineError && (
-        <Card className="border-destructive shadow-lg">
+        <Card className="border-destructive shadow-lg mt-6">
           <CardHeader><CardTitle className="text-destructive">Refine Error</CardTitle></CardHeader>
           <CardContent><p className="text-destructive-foreground">{refineError}</p></CardContent>
         </Card>
       )}
 
       {refineResult && (
-        <Card className="shadow-lg">
+        <Card className="shadow-lg mt-6">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Rewritten Contract</CardTitle>

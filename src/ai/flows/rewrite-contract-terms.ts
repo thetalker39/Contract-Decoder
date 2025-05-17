@@ -1,3 +1,4 @@
+
 // src/ai/flows/rewrite-contract-terms.ts
 'use server';
 
@@ -22,7 +23,7 @@ const RewriteContractTermsInputSchema = z.object({
   industryStandardInfo: z
     .string()
     .optional()
-    .describe('Industry standard information to compare the contract against.'),
+    .describe('Industry standard information to compare the contract against. This can be used to guide the rewrite towards more common and fair terms.'),
 });
 
 export type RewriteContractTermsInput = z.infer<
@@ -32,7 +33,7 @@ export type RewriteContractTermsInput = z.infer<
 const RewriteContractTermsOutputSchema = z.object({
   rewrittenContract: z
     .string()
-    .describe('The rewritten contract with more favorable terms.'),
+    .describe('The rewritten contract with more favorable terms. The rewrite should be comprehensive and detailed, addressing specific clauses to improve them based on industry standards if provided, or general fairness principles.'),
 });
 
 export type RewriteContractTermsOutput = z.infer<
@@ -49,23 +50,32 @@ const rewriteContractTermsPrompt = ai.definePrompt({
   name: 'rewriteContractTermsPrompt',
   input: {schema: RewriteContractTermsInputSchema},
   output: {schema: RewriteContractTermsOutputSchema},
-  prompt: `You are an expert contract lawyer specializing in music contracts.
+  prompt: `You are an expert contract lawyer specializing in music contracts, skilled at drafting clear, fair, and detailed contract language.
+Your task is to rewrite the provided contract text to be more favorable for a producer or artist.
 
-You will rewrite the provided contract to have more favorable terms for a producer or artist.
-
-{{#if aggressiveRewrite}}
-You will aggressively rewrite the contract, removing unfavorable clauses.
-{{else}}
-You will rewrite the contract with more favorable terms, but without removing any clauses.
-{{/if}}
+Original Contract text:
+{{{contractText}}}
 
 {{#if industryStandardInfo}}
-You will compare the contract against the following industry standard information:
+Consider the following industry standard information when rewriting the contract:
 {{{industryStandardInfo}}}
 {{/if}}
 
-Contract text:
-{{{contractText}}}`,
+Rewrite Instructions:
+1.  **Identify Unfavorable Clauses**: Carefully review the original contract and identify clauses that are unfavorable to the artist/producer.
+2.  **Propose Favorable Alternatives**: For each unfavorable clause, draft a rewritten version that is more equitable and aligns better with the artist's/producer's interests. If industry standards are provided, use them as a guide.
+3.  **Level of Aggression**:
+    {{#if aggressiveRewrite}}
+    You will perform an **aggressive rewrite**. This means you should not hesitate to significantly alter or remove clauses that are highly detrimental. Be bold in your revisions to strongly favor the artist/producer.
+    {{else}}
+    You will perform a **standard rewrite**. Aim for a balanced yet more favorable contract. Improve terms and clarify language, but major clause removals should only be done if they are exceptionally one-sided and have no reasonable counter-negotiation point.
+    {{/if}}
+4.  **Clarity and Detail**: Ensure the rewritten contract is clear, unambiguous, and detailed. Vague terms should be made specific.
+5.  **Maintain Contract Integrity**: While making it more favorable, ensure the rewritten contract remains a legally sound and coherent document.
+6.  **Output**: Provide the complete text of the rewritten contract.
+
+The goal is a significantly improved contract for the artist/producer. Be thorough and meticulous in your rewriting.
+`,
 });
 
 const rewriteContractTermsFlow = ai.defineFlow(
