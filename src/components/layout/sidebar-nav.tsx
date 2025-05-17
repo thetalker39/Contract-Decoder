@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { SidebarLink } from "@/components/ui/sidebar"; 
 import type { SidebarLinkItem } from "@/components/ui/sidebar"; 
 import Logo from "@/components/icons/logo";
-import { ScanLine, Sparkles, BarChart3, HelpCircle, LogIn, LayoutDashboard } from "lucide-react"; // Changed LogOut to LogIn
+import { ScanLine, Sparkles, BarChart3, HelpCircle, LogIn, LayoutDashboard, BookOpen } from "lucide-react"; 
 import { useSidebar } from "@/components/ui/sidebar"; 
 import React from "react"; 
 
@@ -16,6 +16,7 @@ const navItems: SidebarLinkItem[] = [
   { href: "/jargon-explanation", label: "Clarity Tool", icon: <Sparkles /> },
   { href: "/contract-analysis", label: "Compare & Refine", icon: <BarChart3 /> },
   { href: "/ask-a-question", label: "Ask A Question", icon: <HelpCircle /> }, 
+  { href: "/learn-center", label: "Learn Center", icon: <BookOpen /> },
 ];
 
 export default function SidebarNav() {
@@ -42,7 +43,7 @@ export default function SidebarNav() {
       </nav>
       <div className="mt-auto p-2"> {/* Login button section */}
         <SidebarLink
-          link={{ href: "#", label: "Login", icon: <LogIn /> }} // Changed label to Login and icon to LogIn
+          link={{ href: "#", label: "Login", icon: <LogIn /> }} 
           isActive={false} 
         />
       </div>
