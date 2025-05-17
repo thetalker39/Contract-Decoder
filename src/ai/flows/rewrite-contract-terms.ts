@@ -102,5 +102,3 @@ const rewriteContractTermsFlow = ai.defineFlow(
     return output!;
   }
 );
-
-```
