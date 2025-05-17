@@ -13,7 +13,7 @@ import FavorabilityGauge from "@/components/favorability-gauge";
 import { analyzeContractFavorability } from "@/ai/flows/analyze-contract-favorability";
 import type { AnalyzeContractFavorabilityOutput } from "@/ai/flows/analyze-contract-favorability";
 import { rewriteContractTerms } from "@/ai/flows/rewrite-contract-terms";
-import type { RewriteContractTermsOutput } from "@/ai/flows/rewrite-contract-terms";
+import type { RewriteContractTermsInput, RewriteContractTermsOutput } from "@/ai/flows/rewrite-contract-terms";
 import { Loader2, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ListItems, ListItem } from "@/components/ui/list";
@@ -71,14 +71,19 @@ export default function ContractAnalysisPage() {
       amount = undefined;
     }
     
+    const input: RewriteContractTermsInput = { 
+      contractText, 
+      aggressiveRewrite, 
+      industryStandardInfo: undefined, // Or pass relevant info if available
+    };
+
+    if (amount !== undefined) {
+      input.desiredAmount = amount;
+      input.isRecoupable = isRecoupable;
+    }
+    
     try {
-      const output = await rewriteContractTerms({ 
-        contractText, 
-        aggressiveRewrite, 
-        industryStandardInfo: undefined, // Or pass relevant info if available
-        desiredAmount: amount,
-        isRecoupable: amount !== undefined ? isRecoupable : undefined, // Only pass isRecoupable if amount is provided
-      });
+      const output = await rewriteContractTerms(input);
       setRefineResult(output);
     } catch (e) {
       console.error(e);
@@ -137,7 +142,7 @@ export default function ContractAnalysisPage() {
             placeholder="Paste your contract text here..."
             value={contractText}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setContractText(e.target.value)}
-            rows={10} // Reduced rows slightly
+            rows={10}
             className="border-border focus:ring-ring"
             disabled={isLoading}
           />
@@ -147,7 +152,7 @@ export default function ContractAnalysisPage() {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Refine Options</CardTitle>
-          <CardDescription>Optionally provide a desired amount and its type for the refined contract.</CardDescription>
+          <CardDescription>Optionally provide a desired amount and its type for the refined contract. You can also choose to perform an aggressive rewrite.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -180,7 +185,7 @@ export default function ContractAnalysisPage() {
                 onCheckedChange={setAggressiveRewrite}
                 disabled={isLoading}
               />
-              <Label htmlFor="aggressiveRewrite" className="text-foreground">Aggressive Rewrite</Label>
+              <Label htmlFor="aggressiveRewrite" className="text-foreground">Aggressive Rewrite (Removes unfavorable clauses)</Label>
             </div>
         </CardContent>
       </Card>
@@ -196,17 +201,45 @@ export default function ContractAnalysisPage() {
           </Button>
       </div>
 
-
       {compareError && (
         <Card className="border-destructive shadow-lg mt-6">
           <CardHeader><CardTitle className="text-destructive">Analysis Error</CardTitle></CardHeader>
           <CardContent><p className="text-destructive-foreground">{compareError}</p></CardContent>
         </Card>
       )}
+      
+      {/* Moved Rewritten Contract section below Refine Options and buttons, but before Compare results */}
+      {refineError && (
+        <Card className="border-destructive shadow-lg mt-6">
+          <CardHeader><CardTitle className="text-destructive">Refine Error</CardTitle></CardHeader>
+          <CardContent><p className="text-destructive-foreground">{refineError}</p></CardContent>
+        </Card>
+      )}
 
+      {refineResult && (
+        <Card className="shadow-lg mt-6">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Rewritten Contract</CardTitle>
+              <CardDescription>More favorable terms, incorporating your preferences.</CardDescription>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(refineResult.rewrittenContract)} className="text-accent hover:text-accent/80">
+              <Copy className="h-5 w-5" />
+              <span className="sr-only">Copy to clipboard</span>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-sm dark:prose-invert max-w-none p-4 bg-muted/50 rounded-md text-foreground whitespace-pre-wrap">
+              {refineResult.rewrittenContract}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Compare Results Section - Appears after refine results if refine was triggered, or independently */}
       {compareResult && (
         <>
-          <div className="my-6">
+          <div className="my-6"> 
               <FavorabilityGauge score={compareResult.favorabilityScore} />
           </div>
           <div className="space-y-6">
@@ -229,35 +262,6 @@ export default function ContractAnalysisPage() {
           </div>
         </>
       )}
-
-      {refineError && (
-        <Card className="border-destructive shadow-lg mt-6">
-          <CardHeader><CardTitle className="text-destructive">Refine Error</CardTitle></CardHeader>
-          <CardContent><p className="text-destructive-foreground">{refineError}</p></CardContent>
-        </Card>
-      )}
-
-      {refineResult && (
-        <Card className="shadow-lg mt-6">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Rewritten Contract</CardTitle>
-              <CardDescription>More favorable terms for a producer or artist.</CardDescription>
-            </div>
-            <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(refineResult.rewrittenContract)} className="text-accent hover:text-accent/80">
-              <Copy className="h-5 w-5" />
-              <span className="sr-only">Copy to clipboard</span>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm dark:prose-invert max-w-none p-4 bg-muted/50 rounded-md text-foreground whitespace-pre-wrap">
-              {refineResult.rewrittenContract}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 }
-
-```
