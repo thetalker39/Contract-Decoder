@@ -22,7 +22,7 @@ const SummarizeContractInputSchema = z.object({
 export type SummarizeContractInput = z.infer<typeof SummarizeContractInputSchema>;
 
 const SummarizeContractOutputSchema = z.object({
-  summary: z.string().describe('A detailed, structured summary of the contract including key terms, clause summaries (with clause numbers/references), and identified unusual provisions with explanations against industry standards for an artist or producer. Each major point should be on a new line.'),
+  summary: z.string().describe('A detailed, structured summary of the contract including key terms, summaries for all discernible clauses (with clause numbers/references), and identified unusual provisions with explanations against industry standards for an artist or producer. Each major point should be on a new line.'),
 });
 export type SummarizeContractOutput = z.infer<typeof SummarizeContractOutputSchema>;
 
@@ -47,9 +47,10 @@ Key Terms and Definitions:
 - [Term 2]: [Detailed definition and its significance.]
 ...
 
-Summaries of each clause or section:
-- [Clause/Section Number/Reference e.g., Clause 1 or Section A]: [Detailed summary of this clause/section. Explain its purpose and implications for the parties involved (considering if it's an artist or producer). If the clause seems standard for that role, mention that. If it deviates from industry norms for that role, explain how and why it might be significant.]
-- [Clause/Section Number/Reference e.g., Clause 2]: [Detailed summary...]
+Summaries of ALL discernible clauses or sections:
+- [Clause/Section Number/Reference e.g., Clause 1 or Section A]: [Provide a detailed summary of this specific clause/section. Explain its purpose and implications for the parties involved (considering if it's an artist or producer). If the clause seems standard for that role, mention that. If it deviates from industry norms for that role, explain how and why it might be significant.]
+- [Clause/Section Number/Reference e.g., Clause 2]: [Detailed summary of this specific clause/section...]
+(Continue this for every clause or section found in the contract text)
 ...
 
 Identification of any unusual or non-standard provisions:
@@ -57,7 +58,7 @@ Identification of any unusual or non-standard provisions:
 - [Another unusual provision...]: [Detailed explanation...]
 ...
 
-Ensure your analysis is thorough. For each summarized clause or identified provision, clearly state its reference (e.g., "Clause 3.1", "Section B.2").
+Ensure your analysis is thorough and covers the entire contract. For each summarized clause or identified provision, clearly state its reference (e.g., "Clause 3.1", "Section B.2").
 When discussing unusual provisions, provide context by comparing them to what is generally expected or considered standard in similar contracts or industries *for an artist or producer*.
 The output should be a single string, but use newlines to separate distinct points and sections as outlined above.
 `,
