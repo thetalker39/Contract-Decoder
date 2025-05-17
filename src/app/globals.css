@@ -5,52 +5,64 @@
 
 @layer base {
   :root {
-    --background: 0 0% 12%; /* Darker Gray - close to #1F1F1F, slightly lighter than pure black */
-    --foreground: 0 0% 90%; /* Light Gray for text */
+    /* Core Colors based on User Request and Reference App Structure */
+    --background: 0 0% 20%; /* User requested Dark Gray #333333 for main content background */
+    --foreground: 0 0% 90%; /* Light Gray text, suitable for dark backgrounds */
 
-    --card: 0 0% 16%; /* Slightly lighter than background for cards - e.g. #292929 */
+    --primary: 277 100% 25.5%; /* User requested Deep Purple #4B0082 */
+    --primary-foreground: 0 0% 98%; /* White/very light text for good contrast on dark purple */
+
+    --accent: 90 100% 49%;   /* User requested Electric Green #7CFC00 */
+    --accent-foreground: 0 0% 5%; /* Very dark text for good contrast on bright green */
+
+    /* Component Colors Derived from Core */
+    /* Card background: In reference app, cards are darker than content background.
+       If content bg is 20% (#333333), card can be 16% (#292929) */
+    --card: 0 0% 16%; 
     --card-foreground: 0 0% 90%;
 
-    --popover: 0 0% 10%; /* Darker for popovers - e.g. #1A1A1A */
+    /* Popover: Darker than card, similar to initial very dark shades */
+    --popover: 0 0% 10%; 
     --popover-foreground: 0 0% 90%;
 
-    --primary: 271 100% 60%; /* Brighter Deep Purple for primary actions - e.g. #7F00FF, closer to reference app's accent brightness */
-    --primary-foreground: 0 0% 98%; /* White/very light text on Primary */
-
-    --secondary: 0 0% 25%; /* A secondary dark shade - e.g. #404040 */
+    /* Secondary: A supporting color, slightly lighter gray than main background */
+    --secondary: 0 0% 25%; /* e.g. #404040 */
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 20%; /* Muted background - e.g. #333333 (user's requested bg) */
-    --muted-foreground: 0 0% 65%; /* Muted text */
+    /* Muted: For less prominent elements/text. Can match main background or be slightly off. */
+    --muted: 0 0% 20%; /* Matching the new --background */
+    --muted-foreground: 0 0% 65%; /* Softer text color */
 
-    --accent: 90 100% 49%; /* #7CFC00 Electric Green */
-    --accent-foreground: 0 0% 5%; /* Very dark text on Electric Green */
-
-    --destructive: 0 72% 51%; /* A good red - e.g. #E53E3E */
+    /* Destructive: Standard red for errors */
+    --destructive: 0 72% 51%; /* Existing red, e.g. #E53E3E */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 28%; /* Border color - e.g. #474747 */
-    --input: 0 0% 16%; /* Input background, same as card - e.g. #292929 */
-    --ring: 90 100% 55%; /* Slightly darker Electric Green for focus rings for better contrast if needed, or keep as accent */
+    /* Borders, Inputs, and Rings */
+    --border: 0 0% 28%; /* Border color, e.g. #474747. Visible against content (20%) and sidebar (12%) */
+    --input: 0 0% 16%; /* Input background, same as card */
+    --ring: 90 100% 55%; /* Ring color, slightly darker green than accent, as per original theme structure. Could also be var(--accent) */
 
-    --radius: 0.5rem;
+    --radius: 0.5rem; /* Keep existing radius */
 
     /* Chart colors */
-    --chart-1: 271 100% 60%; /* Primary */
-    --chart-2: 90 100% 49%;  /* Accent */
+    --chart-1: var(--primary); /* Use new primary */
+    --chart-2: var(--accent);  /* Use accent */
     --chart-3: 210 80% 60%; /* A light blue */
     --chart-4: 30 80% 60%;  /* An orange */
     --chart-5: 150 70% 50%; /* A sea green */
     
-    /* Sidebar specific colors */
-    --sidebar-background: 0 0% 12%; /* Same as main background */
+    /* Sidebar specific colors - Sidebar is very dark, active item is green (accent) */
+    --sidebar-background: 0 0% 12%; /* Very Dark Gray #1F1F1F - Matches reference app sidebar, darker than main content */
     --sidebar-foreground: 0 0% 80%; /* Text in sidebar */
-    --sidebar-primary: 90 100% 49%; /* Accent color for active/hover items in sidebar */
-    --sidebar-primary-foreground: 0 0% 5%; /* Text on sidebar primary */
-    --sidebar-accent: 0 0% 20%; /* Hover bg for sidebar items */
-    --sidebar-accent-foreground: 0 0% 90%; /* Text on hover bg for sidebar items */
-    --sidebar-border: 0 0% 28%;
-    --sidebar-ring: 90 100% 49%;
+    
+    --sidebar-primary: var(--accent); /* Active/hover items in sidebar use Accent Green */
+    --sidebar-primary-foreground: var(--accent-foreground); /* Text on sidebar primary (green) */
+    
+    --sidebar-accent: 0 0% 20%; /* Hover background for sidebar items, slightly lighter than sidebar BG. Same as new --background. */
+    --sidebar-accent-foreground: 0 0% 90%; /* Text on hover background for sidebar items */
+    
+    --sidebar-border: 0 0% 28%; /* Matches main border, provides separation */
+    --sidebar-ring: var(--accent); /* Ring color for sidebar elements */
   }
 }
 
