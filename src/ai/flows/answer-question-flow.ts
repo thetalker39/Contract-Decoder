@@ -30,6 +30,8 @@ const prompt = ai.definePrompt({
   input: {schema: AnswerUserQuestionInputSchema},
   output: {schema: AnswerUserQuestionOutputSchema},
   prompt: `You are an AI assistant for a contract analysis application. Your role is to provide helpful answers and suggestions to user questions.
+Do not use markdown bolding (e.g., **text**) in your response. Present information clearly.
+
 The user's question is:
 "{{{question}}}"
 

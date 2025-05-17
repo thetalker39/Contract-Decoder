@@ -34,9 +34,10 @@ const prompt = ai.definePrompt({
   input: {schema: ScanContractInputSchema},
   output: {schema: ScanContractOutputSchema},
   prompt: `You are an expert legal contract analyst.
+Do not use markdown bolding (e.g., **text**) in your response. Present information clearly.
 
   Your task is to analyze the provided contract text and generate a comprehensive summary.
-  First, try to determine if the contract is primarily for an **artist** or a **producer**. This understanding should subtly guide your analysis.
+  First, try to determine if the contract is primarily for an artist or a producer. This understanding should subtly guide your analysis.
   The summary should include the following:
   - Key terms and definitions (considering their relevance for an artist or producer)
   - Summaries of each clause or section (highlighting implications for the likely role)

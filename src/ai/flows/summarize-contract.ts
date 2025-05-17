@@ -35,7 +35,9 @@ const prompt = ai.definePrompt({
   input: {schema: SummarizeContractInputSchema},
   output: {schema: SummarizeContractOutputSchema},
   prompt: `You are an expert legal contract analyst. Your task is to analyze the provided contract text and generate a comprehensive, detailed, and structured summary.
-First, try to determine if the contract primarily concerns an **artist** or a **producer**. This determination should influence your analysis of industry standards.
+Do not use markdown bolding (e.g., **text**) in your response. Present information clearly.
+
+First, try to determine if the contract primarily concerns an artist or a producer. This determination should influence your analysis of industry standards.
 
 Contract Text:
 {{{contractText}}}
@@ -54,12 +56,12 @@ Summaries of ALL discernible clauses or sections:
 ...
 
 Identification of any unusual or non-standard provisions:
-- [Clause/Section Number/Reference containing the provision]: [Clearly identify the unusual or non-standard provision. Explain in detail why it is considered unusual or non-standard by comparing it to typical industry practices or common legal standards *for the likely role (artist or producer) involved*. Discuss potential risks, benefits, or points of attention for the user regarding this provision.]
+- [Clause/Section Number/Reference containing the provision]: [Clearly identify the unusual or non-standard provision. Explain in detail why it is considered unusual or non-standard by comparing it to typical industry practices or common legal standards for the likely role (artist or producer) involved. Discuss potential risks, benefits, or points of attention for the user regarding this provision.]
 - [Another unusual provision...]: [Detailed explanation...]
 ...
 
 Ensure your analysis is thorough and covers the entire contract. For each summarized clause or identified provision, clearly state its reference (e.g., "Clause 3.1", "Section B.2").
-When discussing unusual provisions, provide context by comparing them to what is generally expected or considered standard in similar contracts or industries *for an artist or producer*.
+When discussing unusual provisions, provide context by comparing them to what is generally expected or considered standard in similar contracts or industries for an artist or producer.
 The output should be a single string, but use newlines to separate distinct points and sections as outlined above.
 `,
 });
@@ -75,4 +77,3 @@ const summarizeContractFlow = ai.defineFlow(
     return output!;
   }
 );
-

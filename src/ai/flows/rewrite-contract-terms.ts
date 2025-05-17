@@ -54,8 +54,10 @@ const rewriteContractTermsPrompt = ai.definePrompt({
   input: {schema: RewriteContractTermsInputSchema},
   output: {schema: RewriteContractTermsOutputSchema},
   prompt: `You are an expert contract lawyer specializing in music contracts, skilled at drafting clear, fair, and detailed contract language for both artists and producers.
+Do not use markdown bolding (e.g., **text**) in your response. Present information clearly.
+
 Your task is to rewrite the provided contract text to be more favorable.
-First, determine if the original contract is primarily for an **artist** or a **producer**. This will guide your approach to rewriting terms according to relevant industry standards.
+First, determine if the original contract is primarily for an artist or a producer. This will guide your approach to rewriting terms according to relevant industry standards.
 
 Original Contract text:
 {{{contractText}}}
@@ -66,29 +68,29 @@ Consider the following industry standard information when rewriting the contract
 {{/if}}
 
 Rewrite Instructions:
-1.  **Identify Unfavorable Clauses**: Carefully review the original contract and identify clauses that are unfavorable to the artist/producer.
-2.  **Propose Favorable Alternatives**: For each unfavorable clause, draft a rewritten version that is more equitable and aligns better with the artist's/producer's interests, reflecting industry standards for their role. If industry standards are provided, use them as a guide.
-3.  **Level of Aggression**:
+1.  Identify Unfavorable Clauses: Carefully review the original contract and identify clauses that are unfavorable to the artist/producer.
+2.  Propose Favorable Alternatives: For each unfavorable clause, draft a rewritten version that is more equitable and aligns better with the artist's/producer's interests, reflecting industry standards for their role. If industry standards are provided, use them as a guide.
+3.  Level of Aggression:
     {{#if aggressiveRewrite}}
-    You will perform an **aggressive rewrite**. This means you should not hesitate to significantly alter or remove clauses that are highly detrimental. Be bold in your revisions to strongly favor the artist/producer.
+    You will perform an aggressive rewrite. This means you should not hesitate to significantly alter or remove clauses that are highly detrimental. Be bold in your revisions to strongly favor the artist/producer.
     {{else}}
-    You will perform a **standard rewrite**. Aim for a balanced yet more favorable contract. Improve terms and clarify language, but major clause removals should only be done if they are exceptionally one-sided and have no reasonable counter-negotiation point.
+    You will perform a standard rewrite. Aim for a balanced yet more favorable contract. Improve terms and clarify language, but major clause removals should only be done if they are exceptionally one-sided and have no reasonable counter-negotiation point.
     {{/if}}
-4.  **Clarity and Detail**: Ensure the rewritten contract is clear, unambiguous, and detailed. Vague terms should be made specific.
-5.  **Maintain Contract Integrity**: While making it more favorable, ensure the rewritten contract remains a legally sound and coherent document.
-6.  **Incorporate User Preferences (If Provided)**:
+4.  Clarity and Detail: Ensure the rewritten contract is clear, unambiguous, and detailed. Vague terms should be made specific.
+5.  Maintain Contract Integrity: While making it more favorable, ensure the rewritten contract remains a legally sound and coherent document.
+6.  Incorporate User Preferences (If Provided):
     {{#if desiredAmount}}
     The user has specified a desired monetary amount of \${{{desiredAmount}}}.
       {{#if isRecoupable}}
-      This amount should be integrated into a relevant clause (e.g., producer advance, artist advance) as a **recoupable advance**.
+      This amount should be integrated into a relevant clause (e.g., producer advance, artist advance) as a recoupable advance.
       {{else}}
-      This amount should be integrated into a relevant clause (e.g., production fee, creative fee) as a **non-recoupable fee**.
+      This amount should be integrated into a relevant clause (e.g., production fee, creative fee) as a non-recoupable fee.
       {{/if}}
     Ensure this amount is naturally and appropriately incorporated into the rewritten contract text, replacing or adjusting existing figures where suitable.
     {{else}}
-    If the contract is for a **producer** and involves a fee or advance, and no specific desired amount is provided by the user, consider that a typical industry standard range for producer advances/fees is **$2,500 - $5,000**. Aim to rewrite relevant clauses to reflect compensation within or towards this range, assuming it's appropriate for the context of the contract.
+    If the contract is for a producer and involves a fee or advance, and no specific desired amount is provided by the user, consider that a typical industry standard range for producer advances/fees is $2,500 - $5,000. Aim to rewrite relevant clauses to reflect compensation within or towards this range, assuming it's appropriate for the context of the contract.
     {{/if}}
-7.  **Output**: Provide the complete text of the rewritten contract.
+7.  Output: Provide the complete text of the rewritten contract.
 
 The goal is a significantly improved contract for the artist/producer. Be thorough and meticulous in your rewriting, always considering the specific role of the party.
 `,

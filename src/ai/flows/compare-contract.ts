@@ -45,7 +45,9 @@ const compareContractPrompt = ai.definePrompt({
   input: {schema: CompareContractInputSchema},
   output: {schema: CompareContractOutputSchema},
   prompt: `You are an AI expert in contract law.
-First, analyze the following contract text to determine if it primarily concerns an **artist** or a **producer**.
+Do not use markdown bolding (e.g., **text**) in your response. Present information clearly.
+
+First, analyze the following contract text to determine if it primarily concerns an artist or a producer.
 Then, determine its favorability towards that user.
 
 Contract Text:
@@ -58,7 +60,7 @@ Compare the contract against the following industry standard information, consid
 
 Provide a favorability score from 1-100 (1 being very unfavorable, 100 being very favorable).
 Also, provide general advice and specific recommendations for the user, tailored to their likely role (artist or producer).
-If the contract pertains to a **producer** and involves an advance or fee, a typical industry standard range to consider for negotiation is **$2,500 - $5,000**. Incorporate this into your recommendations if relevant.
+If the contract pertains to a producer and involves an advance or fee, a typical industry standard range to consider for negotiation is $2,500 - $5,000. Incorporate this into your recommendations if relevant.
 
 Ensure that the output is well-formatted and easy to understand. Follow the output schema strictly.
 `,

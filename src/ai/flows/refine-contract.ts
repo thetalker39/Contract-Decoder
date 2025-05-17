@@ -41,7 +41,9 @@ const refineContractPrompt = ai.definePrompt({
   input: {schema: RefineContractInputSchema},
   output: {schema: RefineContractOutputSchema},
   prompt: `You are an expert contract lawyer specializing in music contracts for both artists and producers.
-First, determine if the provided contract is primarily for an **artist** or a **producer**.
+Do not use markdown bolding (e.g., **text**) in your response. Present information clearly.
+
+First, determine if the provided contract is primarily for an artist or a producer.
 You will rewrite the contract to have more favorable terms for that identified role.
 
 {{#if aggressiveRewrite}}
@@ -55,7 +57,7 @@ You will compare the contract against the following industry standard informatio
 {{{industryStandardInfo}}}
 {{/if}}
 
-If the contract is for a **producer** and involves an advance or fee, aim to rewrite terms that align with an industry standard compensation range of **$2,500 - $5,000** for such services, assuming it's appropriate and not overridden by other instructions like aggressive rewrite.
+If the contract is for a producer and involves an advance or fee, aim to rewrite terms that align with an industry standard compensation range of $2,500 - $5,000 for such services, assuming it's appropriate and not overridden by other instructions like aggressive rewrite.
 
 Contract text:
 {{{contractText}}}`,
